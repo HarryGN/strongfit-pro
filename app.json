@@ -15,7 +15,11 @@
     "android": {
       "package": "com.fitnessapp.app"
     },
-    "web": {
+    "web": {},
+    "extra": {
+      "eas": {
+        "projectId": "47044662-fe1c-424e-b011-df51ea3307ab"
+      }
     }
   }
 }
