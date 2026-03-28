@@ -20,8 +20,7 @@ const HomeScreen: React.FC = () => {
   const [workoutHistory, setWorkoutHistory] = useState<any[]>([]);
   const [nutritionHistory, setNutritionHistory] = useState<any[]>([]);
   const [encouragement, setEncouragement] = useState<string>('');
-  const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+  const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY');
   const { getBodyWeightsAll, getWorkoutLogsAll, getNutritionLogsAll, deleteBodyWeight, deleteWorkoutLog, deleteNutritionLog } = useDatabase();
 
   const loadData = async () => {
@@ -105,7 +104,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
                 <Text style={styles.tableTitle}>Body Weight History</Text>
                 {weightHistory.length === 0 ? <Text style={styles.empty}>No body weight entries yet.</Text> : weightHistory.map((item) => (
                   <View key={`w-${item.id}`} style={styles.tableRow}>
-                    <Text style={styles.rowText}>{new Date(item.date).toLocaleDateString()} 鈥?{item.weight} kg</Text>
+                    <Text style={styles.rowText}>{new Date(item.date).toLocaleDateString()} • {item.weight} kg</Text>
                     <TouchableOpacity onPress={() => handleDeleteBodyWeight(item.id)} style={styles.deleteButton}>
                       <Text style={styles.deleteText}>Delete</Text>
                     </TouchableOpacity>
@@ -115,7 +114,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
                 <Text style={[styles.tableTitle, { marginTop: 14 }]}>Workout History</Text>
                 {workoutHistory.length === 0 ? <Text style={styles.empty}>No workout logs yet.</Text> : workoutHistory.map((item) => (
                   <View key={`wk-${item.id}`} style={styles.tableRow}>
-                    <Text style={styles.rowText}>{new Date(item.date).toLocaleDateString()} 鈥?{item.exercise_name} 鈥?{item.weight}kg x{item.reps}x{item.sets}</Text>
+                    <Text style={styles.rowText}>{new Date(item.date).toLocaleDateString()} • {item.exercise_name} • {item.weight}kg x{item.reps}x{item.sets}</Text>
                     <TouchableOpacity onPress={() => handleDeleteWorkoutLog(item.id)} style={styles.deleteButton}>
                       <Text style={styles.deleteText}>Delete</Text>
                     </TouchableOpacity>
@@ -125,7 +124,7 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
                 <Text style={[styles.tableTitle, { marginTop: 14 }]}>Nutrition History</Text>
                 {nutritionHistory.length === 0 ? <Text style={styles.empty}>No nutrition logs yet.</Text> : nutritionHistory.map((item) => (
                   <View key={`n-${item.id}`} style={styles.tableRow}>
-                    <Text style={styles.rowText}>{new Date(item.date).toLocaleDateString()} 鈥?{item.food_name} 鈥?{item.calories} kcal</Text>
+                    <Text style={styles.rowText}>{new Date(item.date).toLocaleDateString()} • {item.food_name} • {item.calories} kcal</Text>
                     <TouchableOpacity onPress={() => handleDeleteNutritionLog(item.id)} style={styles.deleteButton}>
                       <Text style={styles.deleteText}>Delete</Text>
                     </TouchableOpacity>

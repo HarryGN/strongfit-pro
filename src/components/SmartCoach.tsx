@@ -3,8 +3,7 @@ import { View, Text, Button, StyleSheet, ActivityIndicator, ScrollView } from 'r
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useDatabase } from '../contexts/DatabaseContext';
 
-const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY');
 
 const SmartCoach: React.FC = () => {
   const { getWorkoutLogsThisWeek, getBodyWeightsLastMonth } = useDatabase();

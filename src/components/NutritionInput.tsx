@@ -4,8 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useDatabase } from '../contexts/DatabaseContext';
 
-const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY');
 
 const NutritionInput: React.FC = () => {
   const { insertNutritionLog } = useDatabase();
@@ -154,12 +153,12 @@ Only output the JSON with estimated numbers.`;
           parsed.carbs = parsed.carbs || 0;
           parsed.fat = parsed.fat || 0;
           
-          console.log(`鉁?Success with ${modelName}:`, parsed);
+          console.log(`✅ Success with ${modelName}:`, parsed);
           setNutrition(parsed);
           return; // Success!
         } catch (err: any) {
           lastError = err;
-          console.warn(`鉂?${modelName} failed:`, err?.message);
+          console.warn(`❌ ${modelName} failed:`, err?.message);
           continue; // Try next model
         }
       }
@@ -247,7 +246,7 @@ Only output the JSON with estimated numbers.`;
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>锟?Log Nutrition</Text>
+      <Text style={styles.title}>� Log Nutrition</Text>
       
       {/* Manual Entry (Primary) */}
       {!manualMode ? (
@@ -267,10 +266,10 @@ Only output the JSON with estimated numbers.`;
       {error && (
         <View>
           <Text style={styles.error}>{error}</Text>
-          <Text style={styles.note}>馃挕 Tip: Vision models require a paid Gemini API plan.</Text>
+          <Text style={styles.note}>💡 Tip: Vision models require a paid Gemini API plan.</Text>
         </View>
       )}
-      {loading && <Text style={styles.loading}>馃攧 Analyzing image...</Text>}
+      {loading && <Text style={styles.loading}>🔄 Analyzing image...</Text>}
       
       {image && (
         <View>
@@ -281,7 +280,7 @@ Only output the JSON with estimated numbers.`;
       
       {nutrition && !manualMode && (
         <View style={styles.nutritionBox}>
-          <Text style={styles.resultTitle}>鉁?Nutrition Information</Text>
+          <Text style={styles.resultTitle}>✅ Nutrition Information</Text>
           <Text style={styles.resultText}>Food: {nutrition.food_name}</Text>
           <Text style={styles.resultText}>Calories: {nutrition.calories}</Text>
           <Text style={styles.resultText}>Protein: {nutrition.protein}g</Text>
@@ -306,7 +305,7 @@ Only output the JSON with estimated numbers.`;
       
       {manualMode && (
         <View style={styles.manualBox}>
-          <Text style={styles.resultTitle}>馃摑 Enter Nutrition Information</Text>
+          <Text style={styles.resultTitle}>📝 Enter Nutrition Information</Text>
           
           <Text style={styles.label}>Food Name *</Text>
           <TextInput
