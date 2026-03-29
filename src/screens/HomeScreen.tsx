@@ -20,7 +20,8 @@ const HomeScreen: React.FC = () => {
   const [workoutHistory, setWorkoutHistory] = useState<any[]>([]);
   const [nutritionHistory, setNutritionHistory] = useState<any[]>([]);
   const [encouragement, setEncouragement] = useState<string>('');
-  const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY');
+  const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+  const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
   const { getBodyWeightsAll, getWorkoutLogsAll, getNutritionLogsAll, deleteBodyWeight, deleteWorkoutLog, deleteNutritionLog } = useDatabase();
 
   const loadData = async () => {
@@ -58,7 +59,11 @@ const HomeScreen: React.FC = () => {
     const fetchEncouragement = async () => {
       try {
         const prompt = `Provide one strong motivational sentence in concise style for Harry, an elite gym user, to start the day.`;
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        if (!genAI) {
+          setEncouragement(t('hi'));
+          return;
+        }
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         const result = await model.generateContent([prompt]);
         const text = result.response?.text?.() ?? '';
         setEncouragement(text.trim());

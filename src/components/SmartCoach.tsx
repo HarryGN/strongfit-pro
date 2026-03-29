@@ -3,7 +3,8 @@ import { View, Text, Button, StyleSheet, ActivityIndicator, ScrollView } from 'r
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useDatabase } from '../contexts/DatabaseContext';
 
-const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY');
+const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const SmartCoach: React.FC = () => {
   const { getWorkoutLogsThisWeek, getBodyWeightsLastMonth } = useDatabase();
@@ -41,7 +42,11 @@ Workout data:\n${workoutLines}\n\nWeight data:\n${weightLines}\n\nRespond in a c
       const weights = await getBodyWeightsLastMonth();
       const prompt = buildPrompt(workouts, weights);
 
-      const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
+      if (!genAI) {
+        setError('Missing API key. Add EXPO_PUBLIC_GEMINI_API_KEY to your .env file and restart Expo.');
+        return;
+      }
+      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       const result = await model.generateContent([prompt]);
       const text = result.response?.text?.() ?? 'No response from AI.';
 
@@ -57,7 +62,7 @@ Workout data:\n${workoutLines}\n\nWeight data:\n${weightLines}\n\nRespond in a c
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Smart Coach</Text>
-      <Text style={styles.subtitle}>Gemini 3.1 Flash Lite summary and 7-day improvement plan</Text>
+      <Text style={styles.subtitle}>Gemini summary and 7-day improvement plan</Text>
 
       <Button title="Generate Next Week Plan" onPress={generatePlan} color="#ffab00" />
 

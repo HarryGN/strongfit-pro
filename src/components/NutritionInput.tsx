@@ -4,7 +4,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useDatabase } from '../contexts/DatabaseContext';
 
-const genAI = new GoogleGenerativeAI(process.env.EXPO_PUBLIC_GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY');
+const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 const NutritionInput: React.FC = () => {
   const { insertNutritionLog } = useDatabase();
@@ -92,13 +93,17 @@ const NutritionInput: React.FC = () => {
 
   const analyzeImage = async (base64: string, mimeType: string) => {
     try {
+      if (!genAI) {
+        setError('Missing API key. Add EXPO_PUBLIC_GEMINI_API_KEY to your .env file and restart Expo.');
+        return;
+      }
       setLoading(true);
       setError(null);
       console.log('Starting image analysis...', { mimeType, base64Length: base64.length });
       
       // Try different models in order of preference
+      const modelNames = ['gemini-2.5-flash'];
       let model;
-      const modelNames = ['gemini-2.5-flash', 'gemini-1.5-pro', 'gemini-pro-vision', 'gemini-1.0-pro-vision-latest'];
       let lastError;
       
       for (const modelName of modelNames) {
@@ -171,7 +176,7 @@ Only output the JSON with estimated numbers.`;
       let errorMessage = 'Unknown error';
       
       if (error?.message?.includes('not found')) {
-        errorMessage = 'Model not available. Please check API credentials or upgrade plan.';
+        errorMessage = 'Model not available. Please verify your API key can access gemini-2.5-flash.';
       } else if (error?.message?.includes('quota')) {
         errorMessage = 'API quota exceeded. Please check your Gemini API plan.';
       } else if (error?.message?.includes('401') || error?.message?.includes('403')) {
