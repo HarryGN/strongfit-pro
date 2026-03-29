@@ -2,6 +2,10 @@
 
 A comprehensive fitness and nutrition tracking app built with Expo React Native, featuring AI-driven insights and personalized coaching.
 
+#Note: Read if you are installing this app
+$env:Path += ";C:\Program Files\nodejs"
+npx eas secret:update --scope project --name EXPO_PUBLIC_GEMINI_API_KEY --value "YOUR_NEW_KEY_HERE"
+
 ## Features
 
 ### Core Tracking

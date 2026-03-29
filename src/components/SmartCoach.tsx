@@ -46,9 +46,23 @@ Workout data:\n${workoutLines}\n\nWeight data:\n${weightLines}\n\nRespond in a c
         setError('Missing API key. Add EXPO_PUBLIC_GEMINI_API_KEY to your .env file and restart Expo.');
         return;
       }
-      const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-      const result = await model.generateContent([prompt]);
-      const text = result.response?.text?.() ?? 'No response from AI.';
+      const modelNames = ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+      let text = '';
+
+      for (const modelName of modelNames) {
+        try {
+          const model = genAI.getGenerativeModel({ model: modelName });
+          const result = await model.generateContent([prompt]);
+          text = result.response?.text?.() ?? '';
+          if (text.trim()) break;
+        } catch (modelError) {
+          console.warn(`SmartCoach model failed: ${modelName}`, modelError);
+        }
+      }
+
+      if (!text.trim()) {
+        throw new Error('All fallback models failed to generate a response.');
+      }
 
       setSummary(text);
     } catch (err: any) {

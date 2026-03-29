@@ -13,6 +13,7 @@ const WorkoutInput: React.FC = () => {
   const { t } = useLocalization();
   const [exercise, setExercise] = useState('');
   const [weight, setWeight] = useState('');
+  const [weightUnit, setWeightUnit] = useState<'kg' | 'lbs'>('kg');
   const [reps, setReps] = useState('');
   const [sets, setSets] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -63,7 +64,8 @@ const WorkoutInput: React.FC = () => {
     const r = parseInt(reps);
     const s = parseInt(sets);
     if (exercise && !isNaN(w) && !isNaN(r) && !isNaN(s)) {
-      await insertWorkoutLog(exercise, w, r, s);
+      const weightInKg = weightUnit === 'kg' ? w : w / 2.20462;
+      await insertWorkoutLog(exercise, weightInKg, r, s);
       refreshWorkoutCount();
       await saveExerciseName(exercise);
       // Clear fields
@@ -98,11 +100,25 @@ const WorkoutInput: React.FC = () => {
       )}
 
       <Text style={styles.label}>{t('weight')}</Text>
+      <View style={styles.unitRow}>
+        <TouchableOpacity
+          style={[styles.unitButton, weightUnit === 'kg' && styles.unitButtonActive]}
+          onPress={() => setWeightUnit('kg')}
+        >
+          <Text style={[styles.unitButtonText, weightUnit === 'kg' && styles.unitButtonTextActive]}>kg</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.unitButton, weightUnit === 'lbs' && styles.unitButtonActive]}
+          onPress={() => setWeightUnit('lbs')}
+        >
+          <Text style={[styles.unitButtonText, weightUnit === 'lbs' && styles.unitButtonTextActive]}>lbs</Text>
+        </TouchableOpacity>
+      </View>
       <TextInput
         style={styles.input}
         value={weight}
         onChangeText={setWeight}
-        placeholder={t('weight')}
+        placeholder={`Enter weight in ${weightUnit}`}
         keyboardType="numeric"
       />
       <Text style={styles.label}>{t('reps')}</Text>
@@ -130,6 +146,11 @@ const styles = StyleSheet.create({
   container: { padding: 16, marginBottom: 16, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#d9e3ff', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.12, shadowRadius: 2, elevation: 2 },
   title: { color: '#1e3a68', fontSize: 16, fontWeight: '700', marginBottom: 8 },
   label: { color: '#4f6195', marginTop: 8, marginBottom: 4 },
+  unitRow: { flexDirection: 'row', marginBottom: 6 },
+  unitButton: { marginRight: 8, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8, backgroundColor: '#e7efff' },
+  unitButtonActive: { backgroundColor: '#2e62d4' },
+  unitButtonText: { color: '#1f437f', fontWeight: '600' },
+  unitButtonTextActive: { color: '#fff' },
   input: { borderWidth: 1, borderColor: '#c3d2ef', backgroundColor: '#fbfdff', borderRadius: 8, padding: 10, marginVertical: 6, color: '#1a2a4f' },
   suggestionItem: { paddingVertical: 8, paddingHorizontal: 10, borderBottomWidth: 1, borderBottomColor: '#e2e8ff', backgroundColor: '#fafcff' },
 });

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, StyleSheet, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import WeightInput from '../components/WeightInput';
 import WorkoutInput from '../components/WorkoutInput';
 import NutritionInput from '../components/NutritionInput';
@@ -63,10 +64,21 @@ const HomeScreen: React.FC = () => {
           setEncouragement(t('hi'));
           return;
         }
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-        const result = await model.generateContent([prompt]);
-        const text = result.response?.text?.() ?? '';
-        setEncouragement(text.trim());
+        const modelNames = ['gemini-3.1-flash-lite', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'];
+        let text = '';
+
+        for (const modelName of modelNames) {
+          try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent([prompt]);
+            text = result.response?.text?.() ?? '';
+            if (text.trim()) break;
+          } catch (modelError) {
+            console.warn(`Encouragement model failed: ${modelName}`, modelError);
+          }
+        }
+
+        setEncouragement(text.trim() || t('hi'));
       } catch (error) {
         console.warn('Encouragement fetch failed', error);
         setEncouragement(t('hi'));

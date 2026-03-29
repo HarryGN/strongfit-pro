@@ -39,7 +39,7 @@ const NutritionInput: React.FC = () => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: false,
       quality: 1,
       base64: true,
@@ -72,7 +72,7 @@ const NutritionInput: React.FC = () => {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: false,
       quality: 1,
       base64: true,
@@ -101,7 +101,7 @@ const NutritionInput: React.FC = () => {
       setError(null);
       console.log('Starting image analysis...', { mimeType, base64Length: base64.length });
       
-      // Try different models in order of preference
+      // Use gemini-2.5-flash only for image/multimodal processing
       const modelNames = ['gemini-2.5-flash'];
       let model;
       let lastError;
